@@ -350,6 +350,9 @@ DEPENDS = "\
     yasm-native \
     "
 
+ARMFPABI_armv7a = "${@bb.utils.contains('TUNE_FEATURES', 'callconvention-hard', 'arm_float_abi=hard', 'arm_float_abi=softfp', d)}"
+GYP_DEFINES = "${ARMFPABI} release_extra_cflags='-Wno-error=unused-local-typedefs' sysroot=''"
+
 DEFAULT_CONFIGURATION = "\
     -Dcomponent=static_library \
     -Ddisable_nacl=1 \
@@ -411,6 +414,8 @@ do_configure() {
     # the target compiler is being used and the output is not always valid on the host.
     export CC_host="gcc"
     export CXX_host="g++"
+
+    GYP_DEFINES="${GYP_DEFINES}" export GYP_DEFINES
 
     build/linux/unbundle/replace_gyp_files.py ${DEFAULT_CONFIGURATION}
     xwalk/gyp_xwalk --depth=. ${DEFAULT_CONFIGURATION} -I${WORKDIR}/include.gypi
